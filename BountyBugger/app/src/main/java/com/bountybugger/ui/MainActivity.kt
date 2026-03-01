@@ -14,7 +14,7 @@ import com.bountybugger.ui.mobile.MobileAnalysisActivity
 import com.bountybugger.ui.tools.ToolManagerActivity
 import com.bountybugger.ui.reports.ReportsActivity
 import com.bountybugger.ui.bounty.BountySearchActivity
-//import com.bountybugger.ui.disclosure.DisclosureLetterActivity
+import com.bountybugger.ui.disclosure.DisclosureLetterActivity
 
 /**
  * Main Activity - Home screen with tool categories
@@ -69,10 +69,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, BountySearchActivity::class.java))
         }
 
-        // Disclosure Letter Card - Commented out until fixed
-        // binding.cardDisclosure.setOnClickListener {
-        //     startActivity(Intent(this, DisclosureLetterActivity::class.java))
-        // }
+        // Disclosure Letter Card
+        binding.cardDisclosure.setOnClickListener {
+            startActivity(Intent(this, DisclosureLetterActivity::class.java))
+        }
     }
 
     private fun showDisclaimer() {

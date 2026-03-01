@@ -3,13 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_templates"
-        android:title="@string/select_template"
+        android:id="@+id/action_export_json"
+        android:title="@string/export_json"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_export_markdown"
+        android:title="Export Markdown"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_help"
-        android:title="@string/about"
+        android:id="@+id/action_export_email"
+        android:title="Export Email"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_templates"
+        android:title="@string/select_template"
         app:showAsAction="never" />
 
 </menu>
