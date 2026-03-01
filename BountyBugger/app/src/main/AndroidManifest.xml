@@ -101,17 +101,7 @@
             android:exported="false"
             android:parentActivityName=".ui.reports.ReportsActivity" />
 
-        <!-- Bounty Search Activity -->
-        <activity
-            android:name=".ui.bounty.BountySearchActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.MainActivity" />
 
-        <!-- Disclosure Letter Activity -->
-        <activity
-            android:name=".ui.disclosure.DisclosureLetterActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.MainActivity" />
 
         <!-- File Provider for APK uploads -->
         <provider
