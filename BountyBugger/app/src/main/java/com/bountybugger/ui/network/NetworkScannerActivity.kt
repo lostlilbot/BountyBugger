@@ -1,9 +1,14 @@
 package com.bountybugger.ui.network
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bountybugger.R
@@ -27,6 +32,20 @@ class NetworkScannerActivity : AppCompatActivity() {
     private var isScanning = false
     private var currentResults: List<PortResult> = emptyList()
     private var currentTarget: String = ""
+
+    // Permission launcher for location permission (required for WiFi info on Android 10+)
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permission granted, proceed with auto scan
+            performAutoScan()
+        } else {
+            Toast.makeText(this, "Location permission required for network detection. Please enter IP manually.", Toast.LENGTH_LONG).show()
+            // Try alternative method without location
+            performAlternativeScan()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,8 +185,35 @@ class NetworkScannerActivity : AppCompatActivity() {
 
     /**
      * Auto-detect current network and scan automatically
+     * Handles permission requests for Android 10+
      */
     private fun autoScanNetwork() {
+        // Check if we have location permission (required for WiFi info on Android 10+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            when {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission already granted
+                    performAutoScan()
+                }
+                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                    Toast.makeText(this, "Location permission is needed to detect WiFi network", Toast.LENGTH_LONG).show()
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+                else -> {
+                    // Request permission
+                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+            }
+        } else {
+            // For older Android versions, we can directly access WiFi
+            performAutoScan()
+        }
+    }
+
+    /**
+     * Perform the actual auto scan after permissions are granted
+     */
+    private fun performAutoScan() {
         val networkInfo = networkScanner.getCurrentNetworkInfo()
         
         if (networkInfo != null) {
@@ -182,18 +228,25 @@ class NetworkScannerActivity : AppCompatActivity() {
             startScan(networkInfo.gateway, "1-1000")
         } else {
             // Try alternative method
-            val localIp = networkScanner.getLocalIpAddress()
-            if (localIp != null) {
-                val subnet = localIp.substringBeforeLast(".")
-                currentTarget = "$subnet.1"
-                binding.editTargetIp.setText("$subnet.1")
-                binding.editPortRange.setText("1-1000")
-                
-                Toast.makeText(this, "Scanning local network", Toast.LENGTH_SHORT).show()
-                startScan("$subnet.1", "1-1000")
-            } else {
-                Toast.makeText(this, "Could not detect network. Please enter IP manually.", Toast.LENGTH_LONG).show()
-            }
+            performAlternativeScan()
+        }
+    }
+
+    /**
+     * Alternative scan method without location permission
+     */
+    private fun performAlternativeScan() {
+        val localIp = networkScanner.getLocalIpAddress()
+        if (localIp != null) {
+            val subnet = localIp.substringBeforeLast(".")
+            currentTarget = "$subnet.1"
+            binding.editTargetIp.setText("$subnet.1")
+            binding.editPortRange.setText("1-1000")
+            
+            Toast.makeText(this, "Scanning local network", Toast.LENGTH_SHORT).show()
+            startScan("$subnet.1", "1-1000")
+        } else {
+            Toast.makeText(this, "Could not detect network. Please enter IP manually.", Toast.LENGTH_LONG).show()
         }
     }
 
