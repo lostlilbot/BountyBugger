@@ -13,7 +13,7 @@ import com.bountybugger.ui.web.WebScannerActivity
 import com.bountybugger.ui.mobile.MobileAnalysisActivity
 import com.bountybugger.ui.tools.ToolManagerActivity
 import com.bountybugger.ui.reports.ReportsActivity
-//import com.bountybugger.ui.bounty.BountySearchActivity
+import com.bountybugger.ui.bounty.BountySearchActivity
 //import com.bountybugger.ui.disclosure.DisclosureLetterActivity
 
 /**
@@ -64,10 +64,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ReportsActivity::class.java))
         }
 
-        // Bounty Search Card - Commented out until fixed
-        // binding.cardBounty.setOnClickListener {
-        //     startActivity(Intent(this, BountySearchActivity::class.java))
-        // }
+        // Bounty Search Card
+        binding.cardBounty.setOnClickListener {
+            startActivity(Intent(this, BountySearchActivity::class.java))
+        }
 
         // Disclosure Letter Card - Commented out until fixed
         // binding.cardDisclosure.setOnClickListener {

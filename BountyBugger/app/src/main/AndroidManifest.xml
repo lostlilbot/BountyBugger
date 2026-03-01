@@ -101,6 +101,12 @@
             android:exported="false"
             android:parentActivityName=".ui.reports.ReportsActivity" />
 
+        <!-- Bounty Search Activity -->
+        <activity
+            android:name=".ui.bounty.BountySearchActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
 
 
         <!-- File Provider for APK uploads -->
