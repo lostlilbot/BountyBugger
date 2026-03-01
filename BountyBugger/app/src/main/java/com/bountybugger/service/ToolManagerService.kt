@@ -229,22 +229,37 @@ class ToolManagerService(private val context: Context) {
      */
     suspend fun downloadTool(tool: Tool, onProgress: ((Float) -> Unit)? = null): Result<File> = withContext(Dispatchers.IO) {
         try {
-            val downloadUrl = tool.downloadUrl ?: return@withContext Result.failure(
-                Exception("No download URL available")
-            )
-
-            // For GitHub repos, we can't actually download via git in this context
-            // We'll create a placeholder file with the tool info
-            val toolFile = File(downloadsDir, "${tool.id}.txt")
+            // For built-in tools, create an info file with installation instructions
+            // since these are installed via Termux package manager
+            val toolFile = File(downloadsDir, "${tool.id}_info.txt")
             toolFile.writeText("""
                 Tool: ${tool.name}
                 Repository: ${tool.repositoryUrl}
                 Category: ${tool.category.displayName}
                 Description: ${tool.description}
+                Platform: ${tool.platform.name}
                 
-                To install this tool in Termux, run:
-                pkg update
-                pkg install ${tool.dependencies.joinToString(" ")}
+                ═════════════════════════════════════════════════════════════
+                INSTALLATION INSTRUCTIONS
+                ═════════════════════════════════════════════════════════════
+                
+                This tool can be installed via Termux. Follow these steps:
+                
+                1. Install Termux from Play Store or F-Droid
+                2. Open Termux and run:
+                
+                   pkg update
+                   pkg install ${tool.dependencies.joinToString(" ")}
+                
+                Or for GitHub installation:
+                
+                   pkg install git python
+                   git clone ${tool.repositoryUrl}
+                   cd ${tool.id}
+                   pip install -r requirements.txt
+                
+                Note: Some tools may require additional dependencies.
+                Check the tool's GitHub repository for details.
             """.trimIndent())
 
             onProgress?.invoke(1f)
