@@ -18,7 +18,6 @@ class BountyApiService {
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
-        .addHeader("User-Agent", "BountyBugger/1.0")
         .build()
 
     /**
@@ -83,10 +82,6 @@ class BountyApiService {
                         // Extract CVE if available
                         val cveId = item.optString("cve_id", null)
                         
-                        // Get severity
-                        val severity = item.optJSONObject("severity")
-                        val severityLevel = severity?.optString("level", "unknown") ?: "unknown"
-                        
                         val program = BountyProgram(
                             id = "gh_$ghsaId",
                             name = cveId ?: ghsaId,
@@ -106,7 +101,9 @@ class BountyApiService {
                             lastUpdated = updatedAt.take(10),
                             isPrivate = false,
                             safeHarbor = false,
-                            savedAt = System.currentTimeMillis()
+                            savedAt = System.currentTimeMillis(),
+                            eligibility = null,
+                            disclosurePolicy = null
                         )
                         programs.add(program)
                     }
@@ -148,19 +145,6 @@ class BountyApiService {
                         val published = cve.optString("published", "")
                         val lastModified = cve.optString("lastModified", "")
                         
-                        // Get CVSS score
-                        val metrics = cve.optJSONObject("metrics")
-                        var cvssScore = 0.0
-                        var severity = "UNKNOWN"
-                        
-                        metrics?.let {
-                            val cvssMetric = it.optJSONObject("cvssMetricV31") ?: it.optJSONObject("cvssMetricV30")
-                            cvssMetric?.let { m ->
-                                cvssScore = m.optJSONObject("cvssData")?.optDouble("baseScore", 0.0) ?: 0.0
-                                severity = m.optJSONObject("cvssData")?.optString("baseSeverity", "UNKNOWN") ?: "UNKNOWN"
-                            }
-                        }
-                        
                         val program = BountyProgram(
                             id = "nvd_$cveId",
                             name = cveId,
@@ -180,7 +164,9 @@ class BountyApiService {
                             lastUpdated = lastModified.take(10),
                             isPrivate = false,
                             safeHarbor = false,
-                            savedAt = System.currentTimeMillis()
+                            savedAt = System.currentTimeMillis(),
+                            eligibility = null,
+                            disclosurePolicy = null
                         )
                         programs.add(program)
                     }
@@ -195,13 +181,11 @@ class BountyApiService {
 
     /**
      * Fetch from Open Bug Bounty - Public vulnerability disclosure platform
-     * Note: They have a public page but no public API, so we use their disclosure feed
      */
     private suspend fun fetchOpenBugBounty(): List<BountyProgram> = withContext(Dispatchers.IO) {
         val programs = mutableListOf<BountyProgram>()
         
         try {
-            // Open Bug Bounty main page lists programs - we'll get their featured programs
             val request = Request.Builder()
                 .url("https://openbugbounty.org/")
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -209,14 +193,11 @@ class BountyApiService {
 
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    // Since Open Bug Bounty doesn't have a structured API,
-                    // we'll add their known programs manually (they're mostly known domains)
                     programs.addAll(getOpenBugBountyPrograms())
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            // Fallback to known programs
             programs.addAll(getOpenBugBountyPrograms())
         }
         
@@ -249,7 +230,9 @@ class BountyApiService {
             lastUpdated = "2024-01-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure guidelines"
         ),
 
         // Meta BBP
@@ -274,7 +257,9 @@ class BountyApiService {
             lastUpdated = "2024-02-20",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Meta's disclosure guidelines"
         ),
 
         // Microsoft BRT
@@ -292,14 +277,16 @@ class BountyApiService {
             ),
             outOfScopes = listOf("DOS attacks", "Physical violence", "Bribery"),
             bountyType = listOf(BountyType.WEB, BountyType.API, BountyType.CLOUD),
-            industry = listOf(Industry.TECHNOLOGY, Industry.CLOUD_COMPUTING),
+            industry = listOf(Industry.TECHNOLOGY, Industry.CLOUD),
             minBounty = 500,
             maxBounty = 100000,
             publishedAt = "2014-09-26",
             lastUpdated = "2024-03-01",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow MSRC disclosure policy"
         ),
 
         // Apple BBP
@@ -324,7 +311,9 @@ class BountyApiService {
             lastUpdated = "2024-01-10",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Apple security guidelines"
         ),
 
         // GitHub BBP
@@ -349,7 +338,9 @@ class BountyApiService {
             lastUpdated = "2024-02-01",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow GitHub disclosure policy"
         ),
 
         // Twitter/X BBP (via HackerOne)
@@ -374,7 +365,9 @@ class BountyApiService {
             lastUpdated = "2024-01-20",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // Uber BBP (via Intigriti)
@@ -399,7 +392,9 @@ class BountyApiService {
             lastUpdated = "2024-01-05",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Uber disclosure guidelines"
         ),
 
         // Tesla BBP (via Bugcrowd)
@@ -416,15 +411,17 @@ class BountyApiService {
                 Scope("Tesla Mobile App", "Mobile", "Tesla iOS/Android apps", true)
             ),
             outOfScopes = listOf("Physical damage to vehicles", "Denial of service"),
-            bountyType = listOf(BountyType.WEB, BountyType.MOBILE, BountyType.IOT),
-            industry = listOf(Industry.AUTOMOTIVE, Industry.TECHNOLOGY),
+            bountyType = listOf(BountyType.WEB, BountyType.MOBILE, BountyType.IoT),
+            industry = listOf(Industry.TECHNOLOGY),
             minBounty = 1000,
             maxBounty = 15000,
             publishedAt = "2020-01-01",
             lastUpdated = "2024-02-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // Stripe BBP (via Bugcrowd)
@@ -449,7 +446,9 @@ class BountyApiService {
             lastUpdated = "2024-01-30",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Stripe disclosure guidelines"
         ),
 
         // Shopify BBP (via HackerOne)
@@ -474,7 +473,9 @@ class BountyApiService {
             lastUpdated = "2024-01-25",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Shopify disclosure policy"
         ),
 
         // Slack BBP (via HackerOne)
@@ -499,7 +500,9 @@ class BountyApiService {
             lastUpdated = "2024-02-05",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Slack disclosure guidelines"
         ),
 
         // Airbnb BBP (via HackerOne)
@@ -517,14 +520,16 @@ class BountyApiService {
             ),
             outOfScopes = listOf("Self-XSS", "Spam", "Social engineering"),
             bountyType = listOf(BountyType.WEB, BountyType.API, BountyType.MOBILE),
-            industry = listOf(Industry.TRAVEL, Industry.ECOMMERCE),
+            industry = listOf(Industry.ECOMMERCE),
             minBounty = 500,
             maxBounty = 20000,
             publishedAt = "2016-07-01",
             lastUpdated = "2024-02-10",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // WordPress BBP (via YesWeHack)
@@ -548,7 +553,9 @@ class BountyApiService {
             lastUpdated = "2024-01-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow WordPress security guidelines"
         ),
 
         // Chainlink BBP (via Immunefi)
@@ -565,14 +572,16 @@ class BountyApiService {
             ),
             outOfScopes = listOf("Spam", "UI/UX issues", "Theoretical vulnerabilities"),
             bountyType = listOf(BountyType.BLOCKCHAIN),
-            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTOCURRENCY),
+            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTO),
             minBounty = 2000,
             maxBounty = 350000,
             publishedAt = "2020-09-15",
             lastUpdated = "2024-02-28",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Immunefi disclosure guidelines"
         ),
 
         // Uniswap BBP (via Immunefi)
@@ -589,14 +598,16 @@ class BountyApiService {
             ),
             outOfScopes = listOf("Spam", "Theoretical", "UI/UX"),
             bountyType = listOf(BountyType.BLOCKCHAIN),
-            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTOCURRENCY),
+            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTO),
             minBounty = 5000,
             maxBounty = 1000000,
             publishedAt = "2021-07-01",
             lastUpdated = "2024-02-15",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Uniswap disclosure guidelines"
         )
     )
 
@@ -621,7 +632,9 @@ class BountyApiService {
             lastUpdated = "2024-01-01",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow OBB disclosure guidelines"
         ),
         BountyProgram(
             id = "obb_zomato",
@@ -633,14 +646,16 @@ class BountyApiService {
             scopes = listOf(Scope("*.zomato.com", "Web Application", "Zomato domains", true)),
             outOfScopes = emptyList(),
             bountyType = listOf(BountyType.WEB),
-            industry = listOf(Industry.FOOD),
+            industry = listOf(Industry.ECOMMERCE),
             minBounty = null,
             maxBounty = null,
             publishedAt = "2015-01-01",
             lastUpdated = "2024-01-01",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow OBB disclosure guidelines"
         ),
         BountyProgram(
             id = "obb_reddit",
@@ -659,7 +674,9 @@ class BountyApiService {
             lastUpdated = "2024-01-01",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow OBB disclosure guidelines"
         )
     )
 

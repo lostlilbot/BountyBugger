@@ -31,7 +31,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure guidelines"
         ),
 
         // Meta BBP
@@ -56,7 +58,9 @@ object SampleBountyData {
             lastUpdated = "2024-02-20",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Meta's disclosure guidelines"
         ),
 
         // Microsoft BRP
@@ -74,14 +78,16 @@ object SampleBountyData {
             ),
             outOfScopes = listOf("DOS attacks", "Physical violence", "Bribery"),
             bountyType = listOf(BountyType.WEB, BountyType.API, BountyType.CLOUD),
-            industry = listOf(Industry.TECHNOLOGY, Industry.CLOUD_COMPUTING),
+            industry = listOf(Industry.TECHNOLOGY, Industry.CLOUD),
             minBounty = 500,
             maxBounty = 100000,
             publishedAt = "2014-09-26",
             lastUpdated = "2024-03-01",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow MSRC disclosure policy"
         ),
 
         // Apple BBP
@@ -106,7 +112,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-10",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Apple security guidelines"
         ),
 
         // GitHub BBP
@@ -131,7 +139,9 @@ object SampleBountyData {
             lastUpdated = "2024-02-01",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow GitHub disclosure policy"
         ),
 
         // HackerOne - Twitter
@@ -156,7 +166,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-20",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // Bugcrowd - Tesla
@@ -173,15 +185,17 @@ object SampleBountyData {
                 Scope("Tesla Mobile App", "Mobile", "Tesla iOS/Android apps", true)
             ),
             outOfScopes = listOf("Physical damage to vehicles", "Denial of service"),
-            bountyType = listOf(BountyType.WEB, BountyType.MOBILE, BountyType.IOT),
-            industry = listOf(Industry.AUTOMOTIVE, Industry.TECHNOLOGY),
+            bountyType = listOf(BountyType.WEB, BountyType.MOBILE, BountyType.IoT),
+            industry = listOf(Industry.TECHNOLOGY),
             minBounty = 1000,
             maxBounty = 15000,
             publishedAt = "2020-01-01",
             lastUpdated = "2024-02-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // Intigriti - Uber
@@ -206,7 +220,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-05",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Uber disclosure guidelines"
         ),
 
         // Immunefi - DeFi
@@ -223,14 +239,16 @@ object SampleBountyData {
             ),
             outOfScopes = listOf("Spam", "UI/UX issues", "Theoretical vulnerabilities"),
             bountyType = listOf(BountyType.BLOCKCHAIN),
-            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTOCURRENCY),
+            industry = listOf(Industry.BLOCKCHAIN, Industry.CRYPTO),
             minBounty = 2000,
             maxBounty = 350000,
             publishedAt = "2020-09-15",
             lastUpdated = "2024-02-28",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Immunefi disclosure guidelines"
         ),
 
         // Open Bug Bounty
@@ -253,7 +271,9 @@ object SampleBountyData {
             lastUpdated = "2024-03-01",
             isPrivate = false,
             safeHarbor = false,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow OBB disclosure guidelines"
         ),
 
         // HackerOne - Shopify
@@ -278,7 +298,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-25",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Shopify disclosure policy"
         ),
 
         // HackerOne - Airbnb
@@ -296,14 +318,16 @@ object SampleBountyData {
             ),
             outOfScopes = listOf("Self-XSS", "Spam", "Social engineering"),
             bountyType = listOf(BountyType.WEB, BountyType.API, BountyType.MOBILE),
-            industry = listOf(Industry.TRAVEL, Industry.ECOMMERCE),
+            industry = listOf(Industry.ECOMMERCE),
             minBounty = 500,
             maxBounty = 20000,
             publishedAt = "2016-07-01",
             lastUpdated = "2024-02-10",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow coordinated disclosure"
         ),
 
         // Bugcrowd - Stripe
@@ -328,7 +352,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-30",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Stripe disclosure guidelines"
         ),
 
         // HackerOne - Slack
@@ -353,7 +379,9 @@ object SampleBountyData {
             lastUpdated = "2024-02-05",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow Slack disclosure guidelines"
         ),
 
         // YesWeHack - WordPress
@@ -377,7 +405,9 @@ object SampleBountyData {
             lastUpdated = "2024-01-15",
             isPrivate = false,
             safeHarbor = true,
-            savedAt = System.currentTimeMillis()
+            savedAt = System.currentTimeMillis(),
+            eligibility = "Open to all security researchers",
+            disclosurePolicy = "Follow WordPress security guidelines"
         )
     )
 
@@ -456,13 +486,5 @@ object SampleBountyData {
         }
 
         return filtered
-    }
-
-    private fun <T : Comparable<T>> List<BountyProgram>.sByDescending(selector: (BountyProgram) -> T?): List<BountyProgram> {
-        return this.sortedByDescending { selector(it) ?: "" }
-    }
-
-    private fun <T : Comparable<T>> List<BountyProgram>.sSortedBy(selector: (BountyProgram) -> T?): List<BountyProgram> {
-        return this.sortedBy { selector(it) ?: "" }
     }
 }

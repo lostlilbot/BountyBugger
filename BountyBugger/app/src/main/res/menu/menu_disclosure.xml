@@ -9,18 +9,18 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_save"
+        android:title="Save"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_export_pdf"
         android:title="Export PDF"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_export_word"
-        android:title="Export Word"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_export_json"
-        android:title="@string/export_json"
+        android:title="Export JSON"
         app:showAsAction="never" />
 
     <item
@@ -29,13 +29,8 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_export_email"
-        android:title="Export Email"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_templates"
-        android:title="@string/select_template"
+        android:id="@+id/action_share_email"
+        android:title="Send Email"
         app:showAsAction="never" />
 
 </menu>
