@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Android
+BountyBugger/.gradle/
+BountyBugger/app/build/
+BountyBugger/app/*.apk
+BountyBugger/app/*.aab
+BountyBugger/local.properties
+*.iml
+.gradle/
+build/
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.BountyBugger" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
+
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+        <!-- Error color -->
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/text_primary</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="CardStyle" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/card_background</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+    <!-- Button Style -->
+    <style name="PrimaryButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="SecondaryButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/primary</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- Text Input Style -->
+    <style name="TextInputStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_hint</item>
+        <item name="boxCornerRadiusTopStart">8dp</item>
+        <item name="boxCornerRadiusTopEnd">8dp</item>
+        <item name="boxCornerRadiusBottomStart">8dp</item>
+        <item name="boxCornerRadiusBottomEnd">8dp</item>
+    </style>
+
+    <!-- Toolbar Style -->
+    <style name="ToolbarStyle" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/surface</item>
+        <item name="titleTextColor">@color/text_primary</item>
+    </style>
+
+    <!-- Chip Style -->
+    <style name="ChipStyle" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/surface_variant</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="chipCornerRadius">16dp</item>
+    </style>
+
+    <!-- Severity Badge Styles -->
+    <style name="SeverityBadge">
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="SeverityBadge.Critical">
+        <item name="android:background">@drawable/bg_severity_critical</item>
+    </style>
+
+    <style name="SeverityBadge.High">
+        <item name="android:background">@drawable/bg_severity_high</item>
+    </style>
+
+    <style name="SeverityBadge.Medium">
+        <item name="android:background">@drawable/bg_severity_medium</item>
+    </style>
+
+    <style name="SeverityBadge.Low">
+        <item name="android:background">@drawable/bg_severity_low</item>
+    </style>
+
+    <style name="SeverityBadge.Info">
+        <item name="android:background">@drawable/bg_severity_info</item>
+    </style>
+
+</resources>

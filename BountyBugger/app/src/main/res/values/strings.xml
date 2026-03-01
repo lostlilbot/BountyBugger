@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BountyBugger</string>
+    <string name="app_tagline">Vulnerability Testing Toolbox</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_network">Network</string>
+    <string name="nav_web">Web</string>
+    <string name="nav_mobile">Mobile</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_reports">Reports</string>
+
+    <!-- Home Screen -->
+    <string name="welcome_title">Welcome to BountyBugger</string>
+    <string name="welcome_subtitle">Your personal vulnerability testing toolkit</string>
+    <string name="category_network">Network Scanning</string>
+    <string name="category_network_desc">Port scanning, service detection, network mapping</string>
+    <string name="category_web">Web Vulnerability</string>
+    <string name="category_web_desc">SQLi, XSS, CSRF, headers analysis</string>
+    <string name="category_mobile">Mobile Analysis</string>
+    <string name="category_mobile_desc">APK analysis, static/dynamic testing</string>
+    <string name="category_tools">Tool Manager</string>
+    <string name="category_tools_desc">Search, download, manage pentest tools</string>
+    <string name="category_reports">Reports</string>
+    <string name="category_reports_desc">View and export vulnerability reports</string>
+    <string name="scan_results">Scan Results</string>
+
+    <!-- Network Scanner -->
+    <string name="network_scanner_title">Network Scanner</string>
+    <string name="input_target_ip">Target IP / Range</string>
+    <string name="input_target_port">Port Range (e.g., 1-1000)</string>
+    <string name="btn_start_scan">Start Scan</string>
+    <string name="btn_stop_scan">Stop Scan</string>
+    <string name="scan_in_progress">Scanning in progress…</string>
+    <string name="scan_complete">Scan complete</string>
+    <string name="open_ports">Open Ports</string>
+    <string name="refresh">Refresh</string>
+    <string name="search">Search</string>
+    <string name="closed_ports">Closed Ports</string>
+    <string name="filtered_ports">Filtered Ports</string>
+    <string name="service_detected">Service: %s</string>
+    <string name="port_number">Port: %d</string>
+    <string name="state">State: %s</string>
+
+    <!-- Web Scanner -->
+    <string name="web_scanner_title">Web Vulnerability Scanner</string>
+    <string name="input_target_url">Target URL</string>
+    <string name="scan_options">Scan Options</string>
+    <string name="option_sqli">SQL Injection</string>
+    <string name="option_xss">Cross-Site Scripting (XSS)</string>
+    <string name="option_csrf">CSRF</string>
+    <string name="option_headers">Security Headers</string>
+    <string name="option_ssl">SSL/TLS Analysis</string>
+    <string name="vulnerability_found">Vulnerability Found!</string>
+    <string name="no_vulnerabilities">No vulnerabilities detected</string>
+    <string name="severity_critical">Critical</string>
+    <string name="severity_high">High</string>
+    <string name="severity_medium">Medium</string>
+    <string name="severity_low">Low</string>
+    <string name="severity_info">Informational</string>
+
+    <!-- Mobile Analysis -->
+    <string name="mobile_analysis_title">Mobile App Analysis</string>
+    <string name="select_apk">Select APK File</string>
+    <string name="analyze_apk">Analyze APK</string>
+    <string name="static_analysis">Static Analysis</string>
+    <string name="dynamic_analysis">Dynamic Analysis</string>
+    <string name="permissions_found">Permissions: %d</string>
+    <string name="dangerous_permissions">Dangerous Permissions: %d</string>
+    <string name="manifest_analysis">Manifest Analysis</string>
+    <string name="code_analysis">Code Analysis</string>
+
+    <!-- Tool Manager -->
+    <string name="tool_manager_title">Tool Manager</string>
+    <string name="search_tools">Search tools…</string>
+    <string name="category_all">All</string>
+    <string name="category_network_tools">Network</string>
+    <string name="category_web_tools">Web</string>
+    <string name="category_exploits">Exploits</string>
+    <string name="category_mobile_tools">Mobile</string>
+    <string name="download_tool">Download</string>
+    <string name="install_termux">Install Termux</string>
+    <string name="termux_required">This tool requires Termux to run. Would you like to install it?</string>
+    <string name="download_complete">Download complete</string>
+    <string name="download_failed">Download failed</string>
+    <string name="tool_installed">Tool installed successfully</string>
+    <string name="tool_description">Description</string>
+    <string name="repo_url">Repository</string>
+    <string name="stargazers">Stars: %d</string>
+
+    <!-- Reports -->
+    <string name="reports_title">Vulnerability Reports</string>
+    <string name="generate_report">Generate Report</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="export_json">Export JSON</string>
+    <string name="report_summary">Summary</string>
+    <string name="total_findings">Total Findings: %d</string>
+    <string name="cvss_score">CVSS Score: %.1f</string>
+    <string name="suggested_fix">Suggested Fix</string>
+    <string name="cve_id">CVE: %s</string>
+    <string name="no_reports">No reports generated yet</string>
+
+    <!-- Common -->
+    <string name="loading">Loading…</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="retry">Retry</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="version">Version %s</string>
+    <string name="disclaimer">Disclaimer: This tool is for authorized security testing only. Unauthorized scanning may be illegal.</string>
+    <string name="permission_required">Permission Required</string>
+    <string name="permission_network_rationale">Network permission is required for scanning</string>
+    <string name="permission_storage_rationale">Storage permission is required for saving reports and tools</string>
+    <string name="grant_permission">Grant Permission</string>
+
+    <!-- Termux Integration -->
+    <string name="termux_integration">Termux Integration</string>
+    <string name="termux_not_installed">Termux is not installed</string>
+    <string name="termux_installed">Termux is installed</string>
+    <string name="termux_ready">Ready to run commands via Termux</string>
+    <string name="run_in_termux">Run in Termux</string>
+    <string name="install_package">Install Package</string>
+
+    <!-- Error Messages -->
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_invalid_input">Invalid input. Please check your input.</string>
+    <string name="error_scan_failed">Scan failed. Please try again.</string>
+    <string name="error_no_target">Please enter a target</string>
+    <string name="error_permission_denied">Permission denied</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_api_failed">API request failed</string>
+
+    <!-- Severity Levels -->
+    <string name="severity_9_10">Critical (9.0 - 10.0)</string>
+    <string name="severity_7_9">High (7.0 - 8.9)</string>
+    <string name="severity_4_7">Medium (4.0 - 6.9)</string>
+    <string name="severity_1_4">Low (0.1 - 3.9)</string>
+    <string name="severity_0">None (0.0)</string>
+
+    <!-- Fix Suggestions -->
+    <string name="fix_sql_injection">Use parameterized queries (prepared statements) to prevent SQL injection attacks.</string>
+    <string name="fix_xss">Implement output encoding and Content Security Policy (CSP) headers to prevent XSS.</string>
+    <string name="fix_csrf">Implement anti-CSRF tokens and SameSite cookie attributes.</string>
+    <string name="fix_missing_headers">Add security headers: Strict-Transport-Security, X-Content-Type-Options, X-Frame-Options.</string>
+    <string name="fix_insecure_transport">Enforce HTTPS and disable weak SSL/TLS protocols.</string>
+
+    <!-- Bounty Search -->
+    <string name="bounty_search_title">Bounty Search</string>
+    <string name="category_bounty">Bounty Search</string>
+    <string name="category_bounty_desc">Search bug bounty programs</string>
+    <string name="search_programs">Search programs…</string>
+    <string name="searching_programs">Searching programs…</string>
+    <string name="no_programs_found">No programs found</string>
+    <string name="no_favorites">No favorites yet</string>
+    <string name="error_search_failed">Failed to search programs</string>
+    <string name="favorites">Favorites</string>
+    <string name="filter">Filter</string>
+    <string name="filters">Filters</string>
+    <string name="clear_filters">Clear</string>
+    <string name="apply_filters">Apply</string>
+    <string name="filter_type">Type</string>
+    <string name="filter_industry">Industry</string>
+    <string name="filter_platform">Platform</string>
+    <string name="filter_reward">Reward Range</string>
+    <string name="sort_by">Sort By</string>
+    <string name="filter_private_only">Private Programs Only</string>
+    <string name="filter_with_bounties">Has Bounties</string>
+    <string name="types">Types</string>
+    <string name="industry">Industry</string>
+    <string name="visit_program">Visit</string>
+    <string name="scan">Scan</string>
+    <string name="open_url">Open URL</string>
+
+    <!-- Disclosure Letter -->
+    <string name="disclosure_letter_title">Disclosure Letter</string>
+    <string name="category_disclosure">Disclosure Letter</string>
+    <string name="category_disclosure_desc">Generate vulnerability reports</string>
+    <string name="select_template">Select Template</string>
+    <string name="import_from_scan">Import from Scan</string>
+    <string name="vulnerability_title">Vulnerability Title</string>
+    <string name="summary">Summary</string>
+    <string name="description">Description</string>
+    <string name="vulnerable_url">Vulnerable URL</string>
+    <string name="affected_endpoint">Affected Endpoint</string>
+    <string name="steps_to_reproduce">Steps to Reproduce (one per line)</string>
+    <string name="proof_of_concept">Proof of Concept</string>
+    <string name="impact">Impact</string>
+    <string name="severity">Severity</string>
+    <string name="calculate_cvss">Calculate CVSS</string>
+    <string name="cvss_score_disclosure">CVSS Score</string>
+    <string name="cvss_vector">CVSS Vector</string>
+    <string name="cvss_metrics">CVSS Metrics</string>
+    <string name="attack_vector">Attack Vector</string>
+    <string name="attack_complexity">Attack Complexity</string>
+    <string name="privileges_required">Privileges Required</string>
+    <string name="user_interaction">User Interaction</string>
+    <string name="scope">Scope</string>
+    <string name="confidentiality">Confidentiality</string>
+    <string name="integrity">Integrity</string>
+    <string name="availability">Availability</string>
+    <string name="high">High</string>
+    <string name="low">Low</string>
+    <string name="none">None</string>
+    <string name="av_network">Network</string>
+    <string name="av_adjacent">Adjacent</string>
+    <string name="av_local">Local</string>
+    <string name="av_physical">Physical</string>
+    <string name="ac_low">Low</string>
+    <string name="ac_high">High</string>
+    <string name="pr_none">None</string>
+    <string name="pr_low">Low</string>
+    <string name="pr_high">High</string>
+    <string name="ui_none">None</string>
+    <string name="ui_required">Required</string>
+    <string name="scope_unchanged">Unchanged</string>
+    <string name="scope_changed">Changed</string>
+    <string name="suggested_fix_disclosure">Suggested Fix</string>
+    <string name="environment_details">Environment Details</string>
+    <string name="program_name">Program Name</string>
+    <string name="program_url">Program URL</string>
+    <string name="researcher_name">Researcher Name</string>
+    <string name="preview">Preview</string>
+    <string name="export">Export</string>
+    <string name="export_format">Export Format</string>
+    <string name="share_via">Share Via</string>
+    <string name="share_report">Share Report</string>
+    <string name="clear">Clear</string>
+    <string name="form_cleared">Form cleared</string>
+    <string name="vulnerability_imported">Vulnerability imported</string>
+</resources>
