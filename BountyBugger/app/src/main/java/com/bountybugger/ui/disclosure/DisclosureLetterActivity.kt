@@ -1,6 +1,7 @@
 package com.bountybugger.ui.disclosure
 
 import android.content.Intent
+import android.os.Environment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -29,6 +30,15 @@ class DisclosureLetterActivity : AppCompatActivity() {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     private val refDateFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+
+    private val reportsDir: File
+        get() {
+            val dir = File(getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS), "reports")
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+            return dir
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,8 +182,8 @@ class DisclosureLetterActivity : AppCompatActivity() {
 
     private fun exportToPDF() {
         try {
-            val fileName = "disclosure_${reportReference}.pdf"
-            val file = File(getExternalFilesDir(null), fileName)
+            val fileName = "disclosure_${reportReference}.txt"
+            val file = File(reportsDir, fileName)
             
             val content = buildString {
                 appendLine("Vulnerability Disclosure Report")

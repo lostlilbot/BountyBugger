@@ -76,13 +76,17 @@ class BountyRepository(
         // Fetch from real API
         try {
             val programs = apiService.fetchAllPrograms()
-            cachedPrograms = programs
-            lastFetchTime = currentTime
-            programs
+            if (programs.isNotEmpty()) {
+                cachedPrograms = programs
+                lastFetchTime = currentTime
+                return@withContext programs
+            }
         } catch (e: Exception) {
-            // Fallback to cached if available
-            cachedPrograms ?: emptyList()
+            e.printStackTrace()
         }
+        
+        // Return empty list if API fails
+        emptyList()
     }
 
     /**
