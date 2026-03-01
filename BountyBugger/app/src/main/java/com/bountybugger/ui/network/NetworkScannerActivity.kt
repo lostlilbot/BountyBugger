@@ -33,7 +33,7 @@ class NetworkScannerActivity : AppCompatActivity() {
         binding = ActivityNetworkScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        networkScanner = NetworkScanner()
+        networkScanner = NetworkScanner(this)
         reportGenerator = ReportGenerator(this)
 
         setupToolbar()
@@ -74,13 +74,8 @@ class NetworkScannerActivity : AppCompatActivity() {
         }
 
         binding.btnQuickScan.setOnClickListener {
-            val target = binding.editTargetIp.text.toString().trim()
-            if (target.isEmpty()) {
-                Toast.makeText(this, R.string.error_no_target, Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            currentTarget = target
-            quickScan(target)
+            // Auto-detect network and scan automatically
+            autoScanNetwork()
         }
 
         binding.btnExportJson.setOnClickListener {
@@ -166,6 +161,39 @@ class NetworkScannerActivity : AppCompatActivity() {
         } else {
             val port = portRange.toIntOrNull() ?: 80
             Pair(port, port)
+        }
+    }
+
+    /**
+     * Auto-detect current network and scan automatically
+     */
+    private fun autoScanNetwork() {
+        val networkInfo = networkScanner.getCurrentNetworkInfo()
+        
+        if (networkInfo != null) {
+            // Update UI with network info
+            currentTarget = networkInfo.gateway
+            binding.editTargetIp.setText(networkInfo.gateway)
+            binding.editPortRange.setText("1-1000")
+            
+            Toast.makeText(this, "Scanning network: ${networkInfo.networkName}", Toast.LENGTH_SHORT).show()
+            
+            // Start the scan
+            startScan(networkInfo.gateway, "1-1000")
+        } else {
+            // Try alternative method
+            val localIp = networkScanner.getLocalIpAddress()
+            if (localIp != null) {
+                val subnet = localIp.substringBeforeLast(".")
+                currentTarget = "$subnet.1"
+                binding.editTargetIp.setText("$subnet.1")
+                binding.editPortRange.setText("1-1000")
+                
+                Toast.makeText(this, "Scanning local network", Toast.LENGTH_SHORT).show()
+                startScan("$subnet.1", "1-1000")
+            } else {
+                Toast.makeText(this, "Could not detect network. Please enter IP manually.", Toast.LENGTH_LONG).show()
+            }
         }
     }
 

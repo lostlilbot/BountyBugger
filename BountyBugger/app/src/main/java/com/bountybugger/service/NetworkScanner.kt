@@ -1,5 +1,9 @@
 package com.bountybugger.service
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.wifi.WifiManager
 import com.bountybugger.domain.model.PortResult
 import com.bountybugger.domain.model.PortState
 import kotlinx.coroutines.*
@@ -8,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
 import java.net.Socket
 import kotlin.math.min
 
@@ -15,7 +20,7 @@ import kotlin.math.min
  * Network Scanner - Nmap-style port scanning implementation
  * Provides port scanning, service detection, and network mapping
  */
-class NetworkScanner {
+class NetworkScanner(private val context: Context? = null) {
 
     private val _scanProgress = MutableStateFlow(0f)
     val scanProgress: StateFlow<Float> = _scanProgress.asStateFlow()
@@ -25,6 +30,84 @@ class NetworkScanner {
 
     private var isScanning = false
     private var scanJob: Job? = null
+
+    /**
+     * Get current device's IP address and network info
+     */
+    fun getCurrentNetworkInfo(): NetworkInfo? {
+        return try {
+            context?.let { ctx ->
+                val wifiManager = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                
+                var ipAddress: String? = null
+                var networkName: String? = null
+                var gateway: String? = null
+                
+                // Get WiFi IP
+                val wifiInfo = wifiManager.connectionInfo
+                if (wifiInfo != null) {
+                    val ip = wifiInfo.ipAddress
+                    if (ip != 0) {
+                        ipAddress = String.format("%d.%d.%d.%d", 
+                            ip and 0xff,
+                            ip shr 8 and 0xff,
+                            ip shr 16 and 0xff,
+                            ip shr 24 and 0xff)
+                        
+                        // Get network name (SSID)
+                        networkName = wifiInfo.ssid?.replace("\"", "") ?: "Unknown Network"
+                        
+                        // Calculate gateway
+                        val gatewayInt = wifiManager.dhcpInfo?.gateway ?: 0
+                        if (gatewayInt != 0) {
+                            gateway = String.format("%d.%d.%d.%d", 
+                                gatewayInt and 0xff,
+                                gatewayInt shr 8 and 0xff,
+                                gatewayInt shr 16 and 0xff,
+                                gatewayInt shr 24 and 0xff)
+                        }
+                    }
+                }
+                
+                if (ipAddress != null) {
+                    NetworkInfo(
+                        ipAddress = ipAddress,
+                        networkName = networkName ?: "WiFi",
+                        gateway = gateway ?: ipAddress.substringBeforeLast(".") + ".1",
+                        subnet = ipAddress.substringBeforeLast(".")
+                    )
+                } else {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Get the local IP address (alternative method)
+     */
+    fun getLocalIpAddress(): String? {
+        return try {
+            NetworkInterface.getNetworkInterfaces()?.toList()?.flatMap { networkInterface ->
+                networkInterface.inetAddresses.toList()
+                    .filter { !it.isLoopbackAddress && it.hostAddress?.contains(":") == false }
+                    .map { it.hostAddress }
+            }?.firstOrNull()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    data class NetworkInfo(
+        val ipAddress: String,
+        val networkName: String,
+        val gateway: String,
+        val subnet: String
+    )
 
     // Common port to service mapping
     private val commonPorts = mapOf(
