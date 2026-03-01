@@ -50,3 +50,6 @@ BountyBugger/local.properties
 .gradle/
 build/
 
+# Release APKs (keep these in git)
+!releases/
+
