@@ -188,24 +188,26 @@ class NetworkScannerActivity : AppCompatActivity() {
      * Handles permission requests for Android 10+
      */
     private fun autoScanNetwork() {
-        // Check if we have location permission (required for WiFi info on Android 10+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            when {
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
-                    // Permission already granted
-                    performAutoScan()
-                }
-                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                    Toast.makeText(this, "Location permission is needed to detect WiFi network", Toast.LENGTH_LONG).show()
-                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
-                else -> {
-                    // Request permission
-                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                }
-            }
+        Toast.makeText(this, "Starting Quick Scan...", Toast.LENGTH_SHORT).show()
+        
+        // Show progress
+        binding.progressBar.visibility = View.VISIBLE
+        binding.textProgress.text = "Scanning..."
+        
+        // Try to get local IP and scan
+        val localIp = networkScanner.getLocalIpAddress()
+        
+        if (localIp != null) {
+            val subnet = localIp.substringBeforeLast(".")
+            // Scan the gateway (most common)
+            val gateway = "$subnet.1"
+            binding.editTargetIp.setText(gateway)
+            binding.editPortRange.setText("1-100")
+            
+            Toast.makeText(this, "Quick scanning: $gateway", Toast.LENGTH_SHORT).show()
+            startScan(gateway, "1-100")
         } else {
-            // For older Android versions, we can directly access WiFi
+            // Fallback - try to get from network info
             performAutoScan()
         }
     }
