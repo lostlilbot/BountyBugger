@@ -12,7 +12,7 @@ import com.bountybugger.domain.model.ScanResult
 import com.bountybugger.domain.model.ScanStatus
 import com.bountybugger.domain.model.ScanType
 import com.bountybugger.domain.model.Vulnerability
-//import com.bountybugger.service.ReportGenerator
+import com.bountybugger.service.ReportGenerator
 import com.bountybugger.service.ScanOptions
 import com.bountybugger.service.WebVulnerabilityScanner
 import kotlinx.coroutines.flow.collectLatest
@@ -25,9 +25,11 @@ class WebScannerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWebScannerBinding
     private lateinit var webScanner: WebVulnerabilityScanner
-    //private lateinit var reportGenerator: ReportGenerator
+    private lateinit var reportGenerator: ReportGenerator
     private lateinit var adapter: VulnerabilityAdapter
     private var isScanning = false
+    private var currentVulnerabilities: List<Vulnerability> = emptyList()
+    private var currentTarget: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +37,7 @@ class WebScannerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         webScanner = WebVulnerabilityScanner()
-        //reportGenerator = ReportGenerator(this)
+        reportGenerator = ReportGenerator(this)
 
         setupToolbar()
         setupRecyclerView()
@@ -66,6 +68,7 @@ class WebScannerActivity : AppCompatActivity() {
             }
 
             val url = if (!target.startsWith("http")) "http://$target" else target
+            currentTarget = url
             startScan(url)
         }
 
@@ -78,7 +81,7 @@ class WebScannerActivity : AppCompatActivity() {
         }
 
         binding.btnExportJson.setOnClickListener { exportReport("json") }
-        binding.btnExportPdf.setOnClickListener { exportReport("pdf") }
+        binding.btnExportPdf.setOnClickListener { exportReport("text") }
     }
 
     private fun observeScanProgress() {
@@ -92,6 +95,7 @@ class WebScannerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             webScanner.vulnerabilities.collectLatest { vulns ->
                 adapter.submitList(vulns)
+                currentVulnerabilities = vulns
                 updateSummary(vulns)
             }
         }
@@ -142,32 +146,31 @@ class WebScannerActivity : AppCompatActivity() {
     }
 
     private fun exportReport(format: String) {
-        val vulns = webScanner.vulnerabilities.value
+        val vulns = currentVulnerabilities
         if (vulns.isEmpty()) {
-            Toast.makeText(this, "No results to export", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No results to export. Run a scan first.", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val target = if (currentTarget.isNotEmpty()) currentTarget else binding.editTargetUrl.text.toString()
+
         lifecycleScope.launch {
-            val scanResult = ScanResult(
-                id = ScanResult.generateId(),
-                scanType = ScanType.WEB_SCAN,
-                target = binding.editTargetUrl.text.toString(),
-                startTime = System.currentTimeMillis() - 60000,
-                endTime = System.currentTimeMillis(),
-                status = ScanStatus.COMPLETED,
-                vulnerabilities = vulns
-            )
+            try {
+                val file = reportGenerator.generateReport(
+                    targetUrl = target,
+                    scanType = "WebScan",
+                    vulnerabilities = vulns,
+                    portResults = null
+                )
 
-            // Report generation disabled - ReportGenerator removed
-            /*val file = if (format == "json") {
-                reportGenerator.generateJsonReport(scanResult)
-            } else {
-                reportGenerator.generatePdfReport(scanResult)
+                if (file != null) {
+                    Toast.makeText(this@WebScannerActivity, "Report saved: ${file.name}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@WebScannerActivity, "Failed to generate report", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@WebScannerActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-
-            Toast.makeText(this@WebScannerActivity, "Report saved: ${file.name}", Toast.LENGTH_SHORT).show()*/
-            Toast.makeText(this@WebScannerActivity, "Report feature disabled", Toast.LENGTH_SHORT).show()
         }
     }
 }

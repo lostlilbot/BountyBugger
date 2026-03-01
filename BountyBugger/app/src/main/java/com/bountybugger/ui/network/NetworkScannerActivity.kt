@@ -10,14 +10,10 @@ import com.bountybugger.R
 import com.bountybugger.databinding.ActivityNetworkScannerBinding
 import com.bountybugger.domain.model.PortResult
 import com.bountybugger.domain.model.PortState
-import com.bountybugger.domain.model.ScanResult
-import com.bountybugger.domain.model.ScanStatus
-import com.bountybugger.domain.model.ScanType
 import com.bountybugger.service.NetworkScanner
-//import com.bountybugger.service.ReportGenerator
+import com.bountybugger.service.ReportGenerator
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Date
 
 /**
  * Network Scanner Activity
@@ -26,9 +22,11 @@ class NetworkScannerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityNetworkScannerBinding
     private lateinit var networkScanner: NetworkScanner
-    //private lateinit var reportGenerator: ReportGenerator
+    private lateinit var reportGenerator: ReportGenerator
     private lateinit var adapter: PortResultAdapter
     private var isScanning = false
+    private var currentResults: List<PortResult> = emptyList()
+    private var currentTarget: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +34,7 @@ class NetworkScannerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         networkScanner = NetworkScanner()
-        //reportGenerator = ReportGenerator(this)
+        reportGenerator = ReportGenerator(this)
 
         setupToolbar()
         setupRecyclerView()
@@ -67,6 +65,7 @@ class NetworkScannerActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            currentTarget = target
             startScan(target, portRange)
         }
 
@@ -80,6 +79,7 @@ class NetworkScannerActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.error_no_target, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            currentTarget = target
             quickScan(target)
         }
 
@@ -88,7 +88,7 @@ class NetworkScannerActivity : AppCompatActivity() {
         }
 
         binding.btnExportPdf.setOnClickListener {
-            exportReport("pdf")
+            exportReport("text")
         }
     }
 
@@ -103,6 +103,7 @@ class NetworkScannerActivity : AppCompatActivity() {
         lifecycleScope.launch {
             networkScanner.scanResults.collectLatest { results ->
                 adapter.submitList(results)
+                currentResults = results
                 updateResultsSummary(results)
             }
         }
@@ -169,32 +170,39 @@ class NetworkScannerActivity : AppCompatActivity() {
     }
 
     private fun exportReport(format: String) {
-        val results = networkScanner.scanResults.value
+        val results = currentResults
         if (results.isEmpty()) {
-            Toast.makeText(this, "No results to export", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "No results to export. Run a scan first.", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val target = if (currentTarget.isNotEmpty()) currentTarget else binding.editTargetIp.text.toString()
+
         lifecycleScope.launch {
-            val scanResult = ScanResult(
-                id = ScanResult.generateId(),
-                scanType = ScanType.NETWORK_SCAN,
-                target = binding.editTargetIp.text.toString(),
-                startTime = System.currentTimeMillis() - 60000,
-                endTime = System.currentTimeMillis(),
-                status = ScanStatus.COMPLETED,
-                networkResults = results
-            )
+            try {
+                // Convert port results to a map for the report
+                val portResults: Map<Int, String> = results
+                    .filter { it.state == PortState.OPEN }
+                    .associate { it.port to (it.service ?: "unknown") }
 
-            // Report generation disabled - ReportGenerator removed
-            /*val file = if (format == "json") {
-                reportGenerator.generateJsonReport(scanResult)
-            } else {
-                reportGenerator.generatePdfReport(scanResult)
+                // Since we don't have vulnerabilities, create an empty list
+                val emptyVulns = emptyList<com.bountybugger.domain.model.Vulnerability>()
+
+                val file = reportGenerator.generateReport(
+                    targetUrl = target,
+                    scanType = "NetworkScan",
+                    vulnerabilities = emptyVulns,
+                    portResults = portResults
+                )
+
+                if (file != null) {
+                    Toast.makeText(this@NetworkScannerActivity, "Report saved: ${file.name}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@NetworkScannerActivity, "Failed to generate report", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@NetworkScannerActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-
-            Toast.makeText(this@NetworkScannerActivity, "Report saved: ${file.name}", Toast.LENGTH_SHORT).show()*/
-            Toast.makeText(this@NetworkScannerActivity, "Report feature disabled", Toast.LENGTH_SHORT).show()
         }
     }
 }
