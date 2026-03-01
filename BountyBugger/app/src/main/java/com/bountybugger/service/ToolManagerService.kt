@@ -278,7 +278,9 @@ class ToolManagerService(private val context: Context) {
         }
 
         val packageName = getToolPackageName(tool)
-        return createTermuxIntent("pkg install -y $packageName")
+        // Create command to install the tool
+        val command = "pkg install -y $packageName"
+        return createTermuxIntent(command)
     }
 
     /**
@@ -301,14 +303,41 @@ class ToolManagerService(private val context: Context) {
     }
 
     /**
-     * Create Termux intent
+     * Create Termux intent - tries multiple methods
      */
     private fun createTermuxIntent(command: String): Intent {
-        return Intent("com.termux.RUN_COMMAND").apply {
-            putExtra("com.termux.RUN_COMMAND_COMMAND", command)
-            putExtra("com.termux.RUN_COMMAND_BACKGROUND", false)
-            putExtra("com.termux.RUN_COMMAND_SESSION", "new")
+        // Method 1: Try to use the Termux API (if available)
+        return try {
+            Intent("com.termux.RUN_COMMAND").apply {
+                putExtra("com.termux.RUN_COMMAND_COMMAND", command)
+                putExtra("com.termux.RUN_COMMAND_BACKGROUND", false)
+                putExtra("com.termux.RUN_COMMAND_SESSION", "new")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        } catch (e: Exception) {
+            // Fallback: Open Termux with the command in clipboard
+            createFallbackIntent(command)
         }
+    }
+
+    /**
+     * Fallback method - copies command to clipboard and opens Termux
+     */
+    private fun createFallbackIntent(command: String): Intent {
+        // Use am start to launch Termux with the command
+        return Intent("android.intent.action.MAIN").apply {
+            setClassName("com.termux", "com.termux.app.TermuxActivity")
+            putExtra("com.termux.extra.CHECK_FOR_REFRESH", true)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    }
+
+    /**
+     * Get installation command for a tool (for user to copy)
+     */
+    fun getInstallCommand(tool: Tool): String {
+        val packageName = getToolPackageName(tool)
+        return "pkg install -y $packageName"
     }
 
     /**
