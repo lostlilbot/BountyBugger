@@ -21,6 +21,48 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+        <!-- Report Reference and New Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@color/surface"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Report Reference"
+                    android:textColor="@color/text_hint"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/editReportReference"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="BB-20240301123456" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnNewReport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Report"
+                style="@style/Widget.Material3.Button.TonalButton" />
+
+        </LinearLayout>
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

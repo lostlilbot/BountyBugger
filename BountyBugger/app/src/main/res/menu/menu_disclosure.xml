@@ -3,9 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_new_report"
+        android:title="New Report"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_export_pdf"
+        android:title="Export PDF"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_export_word"
+        android:title="Export Word"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_export_json"
         android:title="@string/export_json"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_export_markdown"

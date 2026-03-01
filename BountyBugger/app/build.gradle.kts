@@ -79,6 +79,9 @@ dependencies {
     // PDF Generation
     implementation("com.itextpdf:itext7-core:7.2.5")
 
+    // Word Document Generation (Apache POI)
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+
     // HTML parsing for web scanning
     implementation("org.jsoup:jsoup:1.17.2")
 
