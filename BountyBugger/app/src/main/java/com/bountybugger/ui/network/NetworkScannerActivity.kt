@@ -214,21 +214,57 @@ class NetworkScannerActivity : AppCompatActivity() {
      * Perform the actual auto scan after permissions are granted
      */
     private fun performAutoScan() {
-        val networkInfo = networkScanner.getCurrentNetworkInfo()
+        // Show that we're scanning
+        binding.progressBar.visibility = View.VISIBLE
+        binding.textProgress.text = "Scanning network..."
         
-        if (networkInfo != null) {
-            // Update UI with network info
-            currentTarget = networkInfo.gateway
-            binding.editTargetIp.setText(networkInfo.gateway)
-            binding.editPortRange.setText("1-1000")
+        lifecycleScope.launch {
+            // First, try to find live hosts on the local subnet
+            val liveHosts = networkScanner.scanLocalSubnet(1500)
             
-            Toast.makeText(this, "Scanning network: ${networkInfo.networkName}", Toast.LENGTH_SHORT).show()
-            
-            // Start the scan
-            startScan(networkInfo.gateway, "1-1000")
-        } else {
-            // Try alternative method
-            performAlternativeScan()
+            if (liveHosts.isNotEmpty()) {
+                // Found live hosts, scan them for open ports
+                Toast.makeText(this@NetworkScannerActivity, "Found ${liveHosts.size} live hosts, scanning for services...", Toast.LENGTH_SHORT).show()
+                
+                val allResults = mutableListOf<PortResult>()
+                
+                // Scan each live host
+                for (host in liveHosts) {
+                    val results = networkScanner.quickScan(host)
+                    allResults.addAll(results)
+                }
+                
+                // Update the results
+                adapter.submitList(allResults)
+                currentResults = allResults
+                updateResultsSummary(allResults)
+                
+                // Show first live host in target field
+                binding.editTargetIp.setText(liveHosts.first())
+                binding.editPortRange.setText("1-1000")
+                
+                binding.progressBar.visibility = View.GONE
+                binding.textProgress.text = ""
+                
+                Toast.makeText(this@NetworkScannerActivity, "Quick scan completed. Found ${allResults.count { it.state == PortState.OPEN }} open ports.", Toast.LENGTH_SHORT).show()
+            } else {
+                // No live hosts found, try the gateway
+                val networkInfo = networkScanner.getCurrentNetworkInfo()
+                
+                if (networkInfo != null) {
+                    currentTarget = networkInfo.gateway
+                    binding.editTargetIp.setText(networkInfo.gateway)
+                    binding.editPortRange.setText("1-1000")
+                    
+                    Toast.makeText(this@NetworkScannerActivity, "Scanning gateway: ${networkInfo.gateway}", Toast.LENGTH_SHORT).show()
+                    
+                    // Start the scan
+                    startScan(networkInfo.gateway, "1-1000")
+                } else {
+                    // Try alternative method
+                    performAlternativeScan()
+                }
+            }
         }
     }
 

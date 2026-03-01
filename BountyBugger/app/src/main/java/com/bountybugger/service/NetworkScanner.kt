@@ -10,6 +10,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.NetworkInterface
@@ -37,45 +39,72 @@ class NetworkScanner(private val context: Context? = null) {
     fun getCurrentNetworkInfo(): NetworkInfo? {
         return try {
             context?.let { ctx ->
-                val wifiManager = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                
                 var ipAddress: String? = null
                 var networkName: String? = null
                 var gateway: String? = null
                 
-                // Get WiFi IP
-                val wifiInfo = wifiManager.connectionInfo
-                if (wifiInfo != null) {
-                    val ip = wifiInfo.ipAddress
-                    if (ip != 0) {
-                        ipAddress = String.format("%d.%d.%d.%d", 
-                            ip and 0xff,
-                            ip shr 8 and 0xff,
-                            ip shr 16 and 0xff,
-                            ip shr 24 and 0xff)
-                        
-                        // Get network name (SSID)
-                        networkName = wifiInfo.ssid?.replace("\"", "") ?: "Unknown Network"
-                        
-                        // Calculate gateway
-                        val gatewayInt = wifiManager.dhcpInfo?.gateway ?: 0
-                        if (gatewayInt != 0) {
-                            gateway = String.format("%d.%d.%d.%d", 
-                                gatewayInt and 0xff,
-                                gatewayInt shr 8 and 0xff,
-                                gatewayInt shr 16 and 0xff,
-                                gatewayInt shr 24 and 0xff)
+                // Try WiFi first
+                try {
+                    val wifiManager = ctx.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiInfo = wifiManager.connectionInfo
+                    if (wifiInfo != null) {
+                        val ip = wifiInfo.ipAddress
+                        if (ip != 0) {
+                            ipAddress = String.format("%d.%d.%d.%d", 
+                                ip and 0xff,
+                                ip shr 8 and 0xff,
+                                ip shr 16 and 0xff,
+                                ip shr 24 and 0xff)
+                            
+                            networkName = wifiInfo.ssid?.replace("\"", "") ?: "Unknown Network"
+                            
+                            val gatewayInt = wifiManager.dhcpInfo?.gateway ?: 0
+                            if (gatewayInt != 0) {
+                                gateway = String.format("%d.%d.%d.%d", 
+                                    gatewayInt and 0xff,
+                                    gatewayInt shr 8 and 0xff,
+                                    gatewayInt shr 16 and 0xff,
+                                    gatewayInt shr 24 and 0xff)
+                            }
                         }
+                    }
+                } catch (e: Exception) {
+                    // WiFi not available
+                }
+                
+                // If no WiFi IP, try to get from network interfaces
+                if (ipAddress == null) {
+                    ipAddress = getLocalIpAddress()
+                }
+                
+                // If still no IP, try from active network
+                if (ipAddress == null) {
+                    try {
+                        val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                        val network = connectivityManager.activeNetwork
+                        val capabilities = connectivityManager.getNetworkCapabilities(network)
+                        if (capabilities != null) {
+                            // Try to get IP from link properties
+                            val linkProperties = connectivityManager.getActiveNetwork()?.let { connectivityManager.getNetworkCapabilities(it) }
+                        }
+                    } catch (e: Exception) {
+                        // Ignore
                     }
                 }
                 
                 if (ipAddress != null) {
+                    val subnet = ipAddress.substringBeforeLast(".")
+                    if (gateway == null) {
+                        gateway = "$subnet.1"
+                    }
+                    if (networkName == null) {
+                        networkName = "Local Network"
+                    }
                     NetworkInfo(
                         ipAddress = ipAddress,
-                        networkName = networkName ?: "WiFi",
-                        gateway = gateway ?: ipAddress.substringBeforeLast(".") + ".1",
-                        subnet = ipAddress.substringBeforeLast(".")
+                        networkName = networkName,
+                        gateway = gateway,
+                        subnet = subnet
                     )
                 } else {
                     null
@@ -98,7 +127,20 @@ class NetworkScanner(private val context: Context? = null) {
                     .map { it.hostAddress }
             }?.firstOrNull()
         } catch (e: Exception) {
-            null
+            e.printStackTrace()
+            // Try alternative method
+            try {
+                val process = Runtime.getRuntime().exec("ip addr show wlan0")
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+                val line = reader.readLines().firstOrNull { it.contains("inet ") }
+                reader.close()
+                line?.let {
+                    val match = Regex("inet (\\d+\\.\\d+\\.\\d+\\.\\d+)").find(it)
+                    match?.groupValues?.get(1)
+                }
+            } catch (ex: Exception) {
+                null
+            }
         }
     }
 
@@ -388,4 +430,50 @@ class NetworkScanner(private val context: Context? = null) {
      * Check if currently scanning
      */
     fun isCurrentlyScanning(): Boolean = isScanning
+
+    /**
+     * Scan local subnet for live hosts (common gateway/router IPs)
+     */
+    suspend fun scanLocalSubnet(timeout: Int = 2000): List<String> = withContext(Dispatchers.IO) {
+        val localIp = getLocalIpAddress() ?: getCurrentNetworkInfo()?.ipAddress
+        if (localIp == null) {
+            return@withContext emptyList()
+        }
+        
+        val subnet = localIp.substringBeforeLast(".")
+        
+        // Common IP addresses to scan on local networks
+        val commonIps = listOf(
+            "$subnet.1",   // Common gateway
+            "$subnet.254", // Common gateway
+            "$subnet.100", // Common gateway
+            "$subnet.2",   // Common gateway
+            "$subnet.3",
+            "$subnet.10",
+            "$subnet.50",
+            "$subnet.99",
+            "$subnet.101",
+            "$subnet.110",
+            "$subnet.150",
+            "$subnet.200",
+            "$subnet.253", // Common gateway
+            // Also scan the device's own IP
+            localIp
+        ).distinct()
+        
+        val liveHosts = mutableListOf<String>()
+        
+        commonIps.forEach { ip ->
+            try {
+                val address = InetAddress.getByName(ip)
+                if (address.isReachable(timeout)) {
+                    liveHosts.add(ip)
+                }
+            } catch (e: Exception) {
+                // Host not reachable
+            }
+        }
+        
+        liveHosts
+    }
 }
